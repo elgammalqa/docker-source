@@ -1,0 +1,16 @@
+version: '3'
+services:
+  db:
+    image: mysql
+    ports:
+        - "3306:3306"
+    environment:
+        MYSQL_DATABASE: haseel_stage
+        MYSQL_USER: haseel
+        MYSQL_PASSWORD: "u$esWeyejeche8+aNas"
+        MYSQL_ROOT_PASSWORD: "u$esWeyejeche8+aNas"
+    volumes:
+        - ./db:/docker-entrypoint-initdb.d
+        - persistent:/var/lib/mysql
+volumes:
+    persistent:

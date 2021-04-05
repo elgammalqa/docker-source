@@ -1,0 +1,82 @@
+version: '3'
+services:
+  web:
+    container_name: haseel-nginx
+    #image: haseel-nginx
+    build: ./build/nginx/.
+    mem_limit: 512m
+    mem_reservation: 128M
+    cpus: 0.5
+    ports:
+       - "8001:80"
+    volumes:
+       - ./src/:/home/haseel/public_html/
+       - ./conf/nginx/nginx.conf:/etc/nginx/nginx.conf
+       - ./conf/nginx/conf.d/:/etc/nginx/conf.d/
+       - ./logs:/var/log/nginx 
+         #restart: always
+    links:
+        - php
+    depends_on:
+        - php
+          #restart: always
+  php:
+    #build:
+    #context: ./build/php-fpm-71
+    container_name: haseel-fpm
+    build: ./build/php-fpm-71/.
+    mem_limit: 512m
+    mem_reservation: 128M
+    cpus: 0.5
+    
+    #image: imagick
+    volumes:
+        - ./src/:/home/haseel/public_html/
+        - ./conf/php-fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
+        - ./conf/php-fpm/upload.ini:/usr/local/etc/php/conf.d/upload.ini
+        - ./conf/image-magick/policy.xml:/etc/ImageMagick-6/policy.xml  
+          #- ./conf/image-magick/policy.xml:/etc/ImageMagick-6/policy.xml
+   # command: ["composer", "install"]
+   # command: ["composer", "update", "Ibtikar/TaniaModelBundle"]
+    environment:
+      - COMPOSER_MEMORY_LIMIT=-1
+        #restart: always
+        #php2:
+        #container_name: haseel-fpm2
+        # build: ./build/php-fpm-71/.
+    #image: haseel-fpm
+    #volumes:
+    #   - ./src/:/home/haseel/public_html/
+    #   - ./conf/php-fpm/www.conf:/usr/local/etc/php-fpm.d/www.conf
+    #   - ./conf/php-fpm/upload.ini:/usr/local/etc/php/conf.d/upload.ini
+   # command: ["composer", "install"]
+   # command: ["composer", "update", "Ibtikar/TaniaModelBundle"]
+   #environment:
+   #  - COMPOSER_MEMORY_LIMIT=-1
+  
+  
+  phpmyadmin:
+          #depends_on:
+          #- db
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+
+    #restart: always
+    ports:
+      - '8080:80'
+    environment:
+      PMA_HOST: haseel-stage.c6b3bzp5mhki.eu-central-1.rds.amazonaws.com
+      MYSQL_ROOT_PASSWORD: password
+    restart: always
+  phpmyadmin_live:
+          #depends_on:
+    container_name: phpmyadmin_live      #- db
+    image: phpmyadmin/phpmyadmin
+    #restart: always
+    ports:
+      - '8082:80'
+    environment:
+      PMA_HOST: haseel.c6b3bzp5mhki.eu-central-1.rds.amazonaws.com
+      MYSQL_ROOT_PASSWORD: password
+      #restart: always
+

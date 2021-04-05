@@ -1,0 +1,46 @@
+FROM php:7.2-fpm
+MAINTAINER Amir
+
+RUN apt-get update && apt-get install -y libssl-dev libxml2-dev zlib1g-dev libicu-dev libpq-dev curl git sudo \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install intl \
+    && docker-php-ext-install zip \
+    && docker-php-ext-install gd mysqli pdo pdo_mysql \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo \
+    && docker-php-ext-install pdo_pgsql pgsql \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-enable opcache \
+    && docker-php-ext-install ftp \
+    && pecl install apcu \
+    && docker-php-ext-enable apcu
+
+
+
+
+
+#RUN usermod -u 1000 www-data
+
+#SYMFONY
+
+
+#COMPOSER
+RUN curl -sS https://getcomposer.org/installer | php
+RUN mv composer.phar /usr/local/bin/composer
+RUN composer self-update 1.10.19
+#RUN composer global require "phpunit/phpunit"
+#ENV PATH /root/.composer/vendor/bin:$PATH
+#RUN ln -s /root/.composer/vendor/bin/phpunit /usr/bin/phpunit
+
+
+#COPY ./composer.sh /tmp/
+#RUN sh /tmp/composer.sh
+# ##########################
+# #add User
+COPY ./user.sh /tmp/
+RUN sh /tmp/user.sh
+# #########################
+WORKDIR /home/haseel/public_html
+USER haseel
+EXPOSE 9000
+CMD ["php-fpm"]
